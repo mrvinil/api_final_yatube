@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import filters, viewsets
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 
 from .models import Group, Post
 from .permissions import IsOwnerOrReadOnly
@@ -38,7 +39,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post']
     filter_backends = [filters.SearchFilter]
     search_fields = ['user__username', 'following__username']
 
@@ -51,6 +53,7 @@ class FollowViewSet(viewsets.ModelViewSet):
 
 
 class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [IsOwnerOrReadOnly]
-    queryset = Group.objects.all()
+    http_method_names = ['get', 'post']
